@@ -1,0 +1,296 @@
+{
+	"info": {
+		"_postman_id": "43d8ed54-57f4-4c45-bfc1-4b7f3c73381d",
+		"name": "GasUtilityPro API Collection.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "42437459",
+		"_collection_link": "https://personal-7703.postman.co/workspace/Gas-Utility-API~36db19ec-8a3c-4a94-8c17-2d04a4882046/collection/42437459-43d8ed54-57f4-4c45-bfc1-4b7f3c73381d?action=share&source=collection_link&creator=42437459"
+	},
+	"item": [
+		{
+			"name": "User Authentication",
+			"item": [
+				{
+					"name": "User Registration",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"Test@123\",\n  \"role\": \"customer\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/register/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"register",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Save access and refresh tokens after login",
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"token\", jsonData.access);",
+									"    pm.environment.set(\"refresh_token\", jsonData.refresh);",
+									"    console.log(\"Token and refresh token set.\");",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"john_doe\",\n  \"password\": \"Test@123\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/login/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Token Refresh",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0Mzg0ODc0NCwiaWF0IjoxNzQzMjQzOTQ0LCJqdGkiOiI1MTJlNGY0ZTRlYTY0MmFmODlkY2JkZTVjNGExYTE4NyIsInVzZXJfaWQiOjJ9._81iRPIw0ucG_ZBvD0N7iFnOvcFuVwmMM6F3ejvb2DQ\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/token/refresh/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"token",
+								"refresh",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Profile",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if the token is expired and refresh it automatically",
+									"var token = pm.environment.get(\"token\");",
+									"if (!token || token === \"\") {",
+									"    pm.sendRequest({",
+									"        url: pm.environment.get(\"base_url\") + \"/token/refresh/\",",
+									"        method: \"POST\",",
+									"        header: {",
+									"            \"Content-Type\": \"application/json\"",
+									"        },",
+									"        body: {",
+									"            mode: \"raw\",",
+									"            raw: JSON.stringify({",
+									"                \"refresh\": pm.environment.get(\"refresh_token\")",
+									"            })",
+									"        }",
+									"    }, function (err, res) {",
+									"        if (!err && res.code === 200) {",
+									"            var data = res.json();",
+									"            pm.environment.set(\"token\", data.access);",
+									"            console.log(\"Token refreshed and updated.\");",
+									"        } else {",
+									"            console.log(\"Error refreshing token: \", err);",
+									"        }",
+									"    });",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/profile/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"profile",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}\n",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// Only set token if it's not already set",
+					"if (!pm.environment.get(\"token\")) {",
+					"    pm.sendRequest({",
+					"        url: pm.environment.get(\"base_url\") + \"/login/\",",
+					"        method: \"POST\",",
+					"        header: {",
+					"            \"Content-Type\": \"application/json\"",
+					"        },",
+					"        body: {",
+					"            mode: \"raw\",",
+					"            raw: JSON.stringify({",
+					"                \"username\": \"john_doe\",",
+					"                \"password\": \"Test@123\"",
+					"            })",
+					"        }",
+					"    }, function (err, res) {",
+					"        if (!err && res.code === 200) {",
+					"            var data = res.json();",
+					"            pm.environment.set(\"token\", data.access);",
+					"            console.log(\"New token generated and set.\");",
+					"        } else {",
+					"            console.log(\"Error fetching token: \", err);",
+					"        }",
+					"    });",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
