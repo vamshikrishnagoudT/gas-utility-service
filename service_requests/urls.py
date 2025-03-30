@@ -9,15 +9,15 @@ from .views import (
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-# ✅ Create Router
+# Create Router
 router = DefaultRouter()
 
-# ✅ Register Endpoints with Router
+# Register Endpoints with Router
 router.register("service-requests", ServiceRequestViewSet, basename="service-requests")
 router.register("service-types", ServiceTypeViewSet, basename="service-types")
 router.register("request-statuses", RequestStatusViewSet, basename="request-statuses")
 
-# ✅ Define URL Patterns
+# Define URL Patterns
 urlpatterns = [
     # User Authentication and Profile
     path("register/", RegisterView.as_view(), name="register"),

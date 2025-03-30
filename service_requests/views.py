@@ -12,14 +12,14 @@ from .serializers import (
     RequestStatusSerializer,
 )
 
-# ✅ User Registration API
+# User Registration API
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
 
 
-# ✅ Get User Profile
+# Get User Profile
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -28,7 +28,7 @@ class UserProfileView(APIView):
         return Response(serializer.data)
 
 
-# ✅ Custom Permission: Role-Based Access Control (RBAC)
+# Custom Permission: Role-Based Access Control (RBAC)
 class IsCustomerOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
@@ -46,7 +46,7 @@ class IsCustomerOrReadOnly(permissions.BasePermission):
         return obj.customer == request.user
 
 
-# ✅ Service Request ViewSet
+# Service Request ViewSet
 class ServiceRequestViewSet(viewsets.ModelViewSet):
     queryset = ServiceRequest.objects.all()
     serializer_class = ServiceRequestSerializer
@@ -57,14 +57,14 @@ class ServiceRequestViewSet(viewsets.ModelViewSet):
         serializer.save(customer=self.request.user)
 
 
-# ✅ Service Type ViewSet (Admin Only)
+# Service Type ViewSet (Admin Only)
 class ServiceTypeViewSet(viewsets.ModelViewSet):
     queryset = ServiceType.objects.all()
     serializer_class = ServiceTypeSerializer
     permission_classes = [IsAdminUser]
 
 
-# ✅ Request Status ViewSet (Admin Only)
+# Request Status ViewSet (Admin Only)
 class RequestStatusViewSet(viewsets.ModelViewSet):
     queryset = RequestStatus.objects.all()
     serializer_class = RequestStatusSerializer
